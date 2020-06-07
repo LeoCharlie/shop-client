@@ -11,7 +11,6 @@
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 
-import {reqCategorys} from './api'
 export default {
   name:"App",
   components: {
@@ -19,11 +18,6 @@ export default {
     Footer
   },
 
-  async mounted(){
-    const res = await reqCategorys()
-    console.log("res", res);
-    
-  }
 }
 </script>
 

@@ -10,14 +10,14 @@ const instance = axios.create({
 })
 
 // 注册请求拦截器
-axios.interceptors.request.use(config =>{// 在真正发送请求前执行
+instance.interceptors.request.use(config =>{// 在真正发送请求前执行
     // 2.1显示请求进度条
     NProgress.start();
     return config
 })
 
 // 注册响应拦截器
-axios.interceptors.response.use(
+instance.interceptors.response.use(
     response=>{
         // 2.2在请求成功后隐藏请求进度条
         NProgress.done();
