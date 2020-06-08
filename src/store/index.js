@@ -8,15 +8,15 @@ Vue.use(Vuex)
 import HOME from "./modules/home"
 import USER from "./modules/user"
 
-const states = {}
-const mutations = {}
-const actions = {}
-const getters = {}
+// const state = {}
+// const mutations = {}
+// const actions = {}
+// const getters = {}
 export default new Vuex.Store({
-    states, 
-    mutations,
-    actions,
-    getters,
+    // state, 
+    // mutations,
+    // actions,
+    // getters,
     modules:{ //制定vuex管理所有子模块
         HOME,
         USER
