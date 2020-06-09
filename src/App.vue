@@ -17,6 +17,10 @@ export default {
     Header,
     Footer
   },
+  async mounted() {
+    // 在路由切换时不会重复发
+    this.$store.dispatch("getCategoryList")
+  },
 
 }
 </script>

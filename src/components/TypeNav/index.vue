@@ -80,7 +80,7 @@ export default {
   mounted(){
     // 通过store对象的dispatch()来触发异步action getCategoryList执行请求获取数据
     // this.$store.dispatch("getCategoryList")
-    this.getCategoryList()
+    // this.getCategoryList()
   },
   methods: {
     ...mapActions(["getCategoryList"]),
@@ -124,10 +124,17 @@ export default {
       }else if(category3id){
         query.category3Id = category3id
       }
+
       const location = {
         name:"search",
         query
       }
+      // 取当前params中的keyword，如果有值，携带上
+      const keyword = this.$route.params.keyword
+      if(keyword){
+        location.params = {keyword}
+      }
+     
       this.$router.push(location)
 
       // 自定隐藏

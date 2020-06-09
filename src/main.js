@@ -2,11 +2,13 @@ import Vue from "vue"
 import App from "./App.vue"
 import router from "./router/index"
 import store from './store/index'
-
 import TypeNav from "./components/TypeNav";
+import '@/mock/mockServer'
+import 'swiper/css/swiper.min.css' //如果查找不是包的主模块，必须指定具体路径
+import Carousel from "./components/Caroused"
 // 注册全局组件
 Vue.component("TypeNav",TypeNav)
-
+Vue.component("Carousel",Carousel)
 new Vue({
   // el:"#app",
   render:h=>h(App),

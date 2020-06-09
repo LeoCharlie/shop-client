@@ -62,8 +62,10 @@ export default {
             // })
             if(keyword){
                 location.params = {keyword}
-                location.query = {keyword2: keyword.toUpperCase()}
             }
+             // 如果当前路由已经有别的数据，携带上
+            location.query = this.$route.query
+            
             this.$router.push(location)
             
 

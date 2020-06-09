@@ -6,6 +6,7 @@
 */
 
 import ajax from "./ajax"
+import mockAjax from '@/api/mockAjax'
 
 // Login
 export function reqLogin(mobile,password){
@@ -24,3 +25,13 @@ export function reqLogin(mobile,password){
 
 // 首页三级分类/product/getBaseCategoryList
 export const reqCategoryList = ()=> ajax("/product/getBaseCategoryList")
+
+// 访问mock借口的请求函数
+export const reqBanners = ()=> mockAjax("/banners")
+export const reqFloors = ()=> mockAjax("/floors")
+export const reqTodayRe = ()=>mockAjax("/todayRecommend")
+
+// 获取商品列表
+// options：包含所有需要传递的搜索请求参数的对象
+
+export const reqProductList = (options) => ajax.post('/list', options)

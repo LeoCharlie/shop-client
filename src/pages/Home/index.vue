@@ -2,10 +2,10 @@
   <div>
     <TypeNav></TypeNav>
     <ListContainer></ListContainer>
-    <TodayRecommend></TodayRecommend>
+    <TodayRecommend :todayList="todayList"></TodayRecommend>
     <Rank></Rank>
     <Like></Like>
-    <Floor></Floor>
+    <Floor v-for="floor in floors" :key="floor.id" :floor="floor"></Floor>
     <Brand></Brand>
   </div>
 </template>
@@ -17,6 +17,8 @@ import Floor from "./Floor/Floor"
 import Like from "./Like/Like"
 import Rank from "./Rank/Rank"
 import TodayRecommend from "./TodayRecommend/TodayRecommend"
+
+import {mapState} from "vuex"
 export default {
     components:{
         ListContainer,
@@ -26,7 +28,18 @@ export default {
         Rank,
         TodayRecommend
     },
-    name:"Home"
+    name:"Home",
+    mounted(){
+      this.$store.dispatch("getBanners")
+      this.$store.dispatch("getFloors")
+      this.$store.dispatch("getTodayRecommend")
+    },
+    computed:{
+      ...mapState({
+        floors: state => state.HOME.floors,
+        todayList:state => state.HOME.todayList
+      })
+    }
 }
 </script>
 
