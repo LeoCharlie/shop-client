@@ -17,6 +17,13 @@ const actions = {
   请求获取商品列表数据的异步action
   */
   async getProductList ({commit}, options) {
+    options = {...options}
+    // 删除options中属性值为空的属性
+    Object.keys(options).forEach(key=>{
+      if(options[key]==="" || (Array.isArray(options[key])&&options[key].length==0)){
+        delete options[key]
+      }
+    })
     const result = await reqProductList(options)
     if (result.code===200) {
       const productList = result.data

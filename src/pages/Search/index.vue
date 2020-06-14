@@ -11,23 +11,35 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>
+            <li class="with-x" v-if="options.categoryName">{{options.categoryName}} 
+              <i @click="removeCategory">×</i>
+            </li>
+            <li class="with-x" v-if="options.keyword">{{options.keyword}} 
+              <i @click="removeKeyword">×</i>
+            </li>
+            <li class="with-x" v-if="options.trademark">{{options.trademark}} 
+              <i @click="removeTrademark">×</i>
+            </li>
+            <li class="with-x" v-for="(prop,index) in options.props" :key="prop">{{prop}} 
+              <i @click="removeProp(index)">×</i>
+            </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector :setTrademark="setTrademark"
+        @addProps="addProps"/>
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{active: isActive('1')}" @click="setOrder('1')">
+                  <a href="javascript:;">
+                    综合<i class="iconfont" v-if="isActive('1')"
+                          :class="iconClass"></i>
+                  </a>
                 </li>
                 <li>
                   <a href="#">销量</a>
@@ -38,21 +50,26 @@
                 <li>
                   <a href="#">评价</a>
                 </li>
-                <li>
-                  <a href="#">价格⬆</a>
+                <li :class="{active: isActive('2')}" @click="setOrder('2')">
+                  <a href="javascript:;">
+                    价格<i class="iconfont" v-if="isActive('2')"
+                          :class="iconClass"></i>
+                  </a>
                 </li>
-                <li>
+                <!-- <li>
                   <a href="#">价格⬇</a>
-                </li>
+                </li> -->
               </ul>
             </div>
           </div>
           <div class="goods-list">
             <ul class="yui3-g">
-              <li class="yui3-u-1-5" v-for="item in productList.goodsList" :key="item.id">
+              <li class="yui3-u-1-5" v-for=" item in productList.goodsList" :key="item.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="item.html" target="_blank"><img :src="item.defaultImg" /></a>
+                    <router-link :to="`/detail/${item.id}`">
+                      <img :src="item.defaultImg" />
+                    </router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -61,7 +78,9 @@
                     </strong>
                   </div>
                   <div class="attr">
-                    <a target="_blank" href="item.html" title="促销信息，下单即赠送三个月CIBN视频会员卡！【小米电视新品4A 58 火爆预约中】">{{item.title}}</a>
+                    <router-link :to="`/detail/${item.id}`">
+                      {{item.title}}
+                    </router-link>
                   </div>
                   <div class="commit">
                     <i class="command">已有<span>2000</span>人评价</i>
@@ -74,35 +93,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
-          </div>
+          <Pagination
+          :currentPage = "options.pageNo"
+          :pageSize = "options.pageSize"
+          :total = "productList.total"
+          :showPage = "5"
+          @currentChange = "getProductList"
+          ></Pagination>
         </div>
       </div>
     </div>
@@ -129,42 +126,107 @@
           trademark: '', // 品牌: "ID:品牌名称" "1:苹果"
           order: '1:desc', // 排序方式  1: 综合,2: 价格 asc: 升序,desc: 降序  "1:desc"
           pageNo: 1, // 页码
-          pageSize: 20, //	每页数量
+          pageSize: 2, //	每页数量
         }
       }
     },
     created(){
+      this.updateOptions()
       this.getProductList()
     },
-    // 放初始同步更新data数据的代码
-    beforeMount(){
-      
-    },
     methods:{
-      getProductList(){
-        const {categoryName,category1Id,category2Id,category3Id} = this.$route.query
-        const {keyword} = this.$route.params
-        const options = {
+      updateOptions () {
+        // 取出参数数据
+        const {categoryName='', category1Id='', category2Id='', category3Id=''} = this.$route.query
+        const {keyword=''} = this.$route.params
+        // 更新options
+        this.options = {
           ...this.options,
           categoryName,
           category1Id,
           category2Id,
           category3Id,
-          keyword
+          keyword,
+        } // 同名属性覆盖, 非同名属性保留
+      },
+      getProductList(page=1){
+        this.options.pageNo = page
+        this.$store.dispatch('getProductList', this.options)
+      },
+      // 选中哪一项order
+      isActive(overFlag){
+        return this.options.order.indexOf(overFlag)===0
+      },
+      setOrder(flag){
+        // this.options.order.split(":") //[orderFlag,orderType]
+        let [orderFlag,orderType] = this.options.order.split(":")
+        // 点击的是已经选择的排序项，则改变排序方式，
+        // 点击的是未选择的排序项，则改变排序项且默认设置为降序
+        if(flag === orderFlag){
+          orderType = orderType === "asc" ? "desc": "asc" 
+        }else{
+          orderFlag = flag
+          orderType = "desc"
         }
-        this.$store.dispatch('getProductList', options)
+        // 更新order
+        this.options.order = orderFlag + ":" + orderType
+        // 重新发请求
+        this.getProductList()
+      },
+      removeCategory(){
+        // 重置相关数据
+        this.options.categoryName = ''
+        this.options.category1Id = ''
+        this.options.category2Id = ''
+        this.options.category3Id = ''
+        // 重新跳转到当前search 去掉query参数
+        this.$router.replace({name:"search",params:this.$route.params})
+      },
+      removeKeyword () {
+        this.options.keyword = ''
+        // 重新跳转到当前search 去掉params参数
+        this.$router.replace({name:"search",query:this.$route.query})
+        // 通过事件总线对象分发自定义事件
+        this.$bus.$emit('removeKey')
+      },
+      // 设置品牌数据
+      setTrademark(trademark){
+        if(this.options.trademark === trademark) return
+        // 直接添加属性，如果不发请求，页面不会自动更新
+        // this.options.trademark = trademark
+        // 添加新属性，不发送请求自动更新界面
+        this.$set(this.options, "trademark", trademark)
+        // 重新请求
+        this.getProductList()
+      },
+      removeTrademark(){
+        this.$delete(this.options, "trademark")
+        this.getProductList()
+      },
+      addProps(prop){
+        if(this.options.props.indexOf(prop)>=0) return
+        this.options.props.push(prop)
+        this.getProductList();
+      },
+      removeProp(index){
+        this.options.props.splice(index,1)
+        this.getProductList();
       }
     },
     watch:{
       // 当路由跳转时只有参数发生了变化
       '$route'(){
+        this.updateOptions();
         this.getProductList()
       }
     },
     computed:{
       ...mapState({
         productList: state => state.search.productList
-      })
+      }),
+      iconClass(){
+        return this.options.order.split(':')[1]==='asc' ? 'iconup':'icondown'
+      }
     }
 
   }

@@ -31,7 +31,7 @@
             </router-link>
         </h1>
         <div class="searchArea">
-            <form action="###" class="searchForm">
+            <form action="###" class="searchForm"> <!--@submit.prevent="search"阻止表单默认提交行为，避免刷新页面-->
                 <input type="text" id="autocomplete" class="input-error input-xxlarge" v-model="keyword"/>
                 <button class="sui-btn btn-xlarge btn-danger" type="button" @click="search">搜索</button>
             </form>
@@ -66,7 +66,12 @@ export default {
              // 如果当前路由已经有别的数据，携带上
             location.query = this.$route.query
             
-            this.$router.push(location)
+            if(this.$route.name !== "search"){
+                this.$router.push(location)
+            }else{
+                this.$router.replace(location)
+            }
+            
             
 
             // 使用vue-router 3.1的语法，第二个参数写了回调的话，不会抛出错误的promise
@@ -80,6 +85,12 @@ export default {
                 
             // })
         }
+    },
+    mounted() {
+        // 通过事件总线对象绑定自定义事件，在回调中删除输入数据
+        this.$bus.$on("removeKey",()=>{
+            this.keyword = ""
+        })
     },
 }
 </script>
